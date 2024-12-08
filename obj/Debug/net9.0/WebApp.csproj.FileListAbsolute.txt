@@ -1,10 +1,3 @@
-/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.csproj.AssemblyReference.cache
-/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.GeneratedMSBuildEditorConfig.editorconfig
-/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.AssemblyInfoInputs.cache
-/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.AssemblyInfo.cs
-/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.csproj.CoreCompileInputs.cache
-/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.MvcApplicationPartsAssemblyInfo.cs
-/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.MvcApplicationPartsAssemblyInfo.cache
 /Users/sam/repos/WebApp/bin/Debug/net9.0/appsettings.Development.json
 /Users/sam/repos/WebApp/bin/Debug/net9.0/appsettings.json
 /Users/sam/repos/WebApp/bin/Debug/net9.0/WebApp.staticwebassets.endpoints.json
@@ -22,6 +15,14 @@
 /Users/sam/repos/WebApp/bin/Debug/net9.0/Microsoft.OpenApi.dll
 /Users/sam/repos/WebApp/bin/Debug/net9.0/MySqlConnector.dll
 /Users/sam/repos/WebApp/bin/Debug/net9.0/Pomelo.EntityFrameworkCore.MySql.dll
+/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.csproj.AssemblyReference.cache
+/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.AssemblyInfoInputs.cache
+/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.AssemblyInfo.cs
+/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.csproj.CoreCompileInputs.cache
+/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.MvcApplicationPartsAssemblyInfo.cs
+/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.MvcApplicationPartsAssemblyInfo.cache
+/Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.sourcelink.json
 /Users/sam/repos/WebApp/obj/Debug/net9.0/scopedcss/bundle/WebApp.styles.css
 /Users/sam/repos/WebApp/obj/Debug/net9.0/staticwebassets.build.json
 /Users/sam/repos/WebApp/obj/Debug/net9.0/staticwebassets.development.json

@@ -16,22 +16,62 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-        // GET: api/Posts
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PostDto>>> GetPosts()
+[HttpPost]
+public async Task<ActionResult<PostDto>> PostPost(PostDto postDto)
+{
+    var user = await _context.Users.FindAsync(postDto.UserId);
+    if (user == null)
+    {
+        return BadRequest("Invalid UserId. User does not exist.");
+    }
+
+    var post = new Models.Post
+    {
+        Title = postDto.Title,
+        Content = postDto.Content,
+        UserId = postDto.UserId // Correctly map UserId
+    };
+
+    try
+    {
+        _context.Posts.Add(post);
+        await _context.SaveChangesAsync();
+
+        postDto.Id = post.Id;
+        postDto.Name = user.Name; // Populate Name for the response
+        return CreatedAtAction(nameof(GetPost), new { id = post.Id }, postDto);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Internal server error: {ex.Message}");
+    }
+}
+
+
+        //get all
+[HttpGet]
+public async Task<ActionResult<IEnumerable<PostDto>>> GetPosts()
+{
+    var posts = await _context.Posts
+        .Include(p => p.User) // Ensure User is included for mapping
+        .Select(p => new PostDto
         {
-            var posts = await _context.Posts
-                .Select(p => new PostDto
-                {
-                    Id = p.Id,
-                    Title = p.Title,
-                    Content = p.Content
-                })
-                .ToListAsync();
+            Id = p.Id,
+            Title = p.Title,
+            Content = p.Content,
+            UserId = p.UserId,
+            Name = p.User != null ? p.User.Name : "Unknown" // Safely map User.Name to PostDto.Name
+        })
+        .ToListAsync();
 
-            return posts;
-        }
+    return Ok(posts);
+}
 
+
+
+
+
+      
         // GET: api/Posts/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PostDto>> GetPost(int id)
@@ -54,23 +94,6 @@ namespace WebApp.Controllers
             return post;
         }
 
-        // POST: api/Posts
-        [HttpPost]
-        public async Task<ActionResult<PostDto>> PostPost(PostDto postDto)
-        {
-            var post = new Models.Post
-            {
-                Title = postDto.Title,
-                Content = postDto.Content,
-                UserId = postDto.Id // Ensure this is provided in your DTO
-            };
-
-            _context.Posts.Add(post);
-            await _context.SaveChangesAsync();
-
-            postDto.Id = post.Id;
-            return CreatedAtAction(nameof(GetPost), new { id = post.Id }, postDto);
-        }
 
         // PUT: api/Posts/5
         [HttpPut("{id}")]

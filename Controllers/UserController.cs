@@ -17,26 +17,29 @@ namespace WebApp.Controllers
         }
 
         // GET: api/Users
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
+[HttpGet]
+public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
+{
+    var users = await _context.Users
+        .Include(u => u.Posts)
+        .Select(u => new UserDto
         {
-            var users = await _context.Users
-                .Include(u => u.Posts)
-                .Select(u => new UserDto
-                {
-                    Id = u.Id,
-                    Name = u.Name,
-                    Posts = u.Posts.Select(p => new PostDto
-                    {
-                        Id = p.Id,
-                        Title = p.Title,
-                        Content = p.Content
-                    }).ToList()
-                })
-                .ToListAsync();
+            Id = u.Id,
+            Name = u.Name,
+            Posts = u.Posts.Select(p => new PostDto
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Content = p.Content,
+                UserId = p.UserId,
+                Name = u.Name // Map the user's name here
+            }).ToList()
+        })
+        .ToListAsync();
 
-            return users;
-        }
+    return Ok(users);
+}
+
 
         // GET: api/Users/5
         [HttpGet("{id}")]
@@ -65,27 +68,37 @@ namespace WebApp.Controllers
 
             return user;
         }
-
-        // POST: api/Users
-        [HttpPost]
+        
+        //post user
+       [HttpPost]
         public async Task<ActionResult<UserDto>> PostUser(UserDto userDto)
         {
-            var user = new Models.User
-            {
-                Name = userDto.Name,
-                Posts = userDto.Posts.Select(p => new Models.Post
+            if (string.IsNullOrWhiteSpace(userDto.Name))
                 {
-                    Title = p.Title,
-                    Content = p.Content
-                }).ToList()
-            };
+            return BadRequest(new
+                {
+                    Title = "Validation Error",
+                    Errors = new { Name = "The Name field is required." }
+                });
+                 }
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+             var user = new Models.User
+            {
+            Name = userDto.Name,
+            Posts = userDto.Posts?.Select(p => new Models.Post
+                {
+               Title = p.Title,
+                Content = p.Content
+                }).ToList() ?? new List<Models.Post>() // Handle null Posts
+                };
 
-            userDto.Id = user.Id;
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, userDto);
-        }
+    _context.Users.Add(user);
+    await _context.SaveChangesAsync();
+
+    userDto.Id = user.Id;
+    return CreatedAtAction(nameof(GetUser), new { id = user.Id }, userDto);
+}
+
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
