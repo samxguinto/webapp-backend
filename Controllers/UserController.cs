@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization; // Required for [Authorize]
 using WebApp.Data;
 using WebApp.DTOs;
 
@@ -7,6 +8,7 @@ namespace WebApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] // Apply authorization globally to the controller
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -17,29 +19,28 @@ namespace WebApp.Controllers
         }
 
         // GET: api/Users
-[HttpGet]
-public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
-{
-    var users = await _context.Users
-        .Include(u => u.Posts)
-        .Select(u => new UserDto
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
-            Id = u.Id,
-            Name = u.Name,
-            Posts = u.Posts.Select(p => new PostDto
-            {
-                Id = p.Id,
-                Title = p.Title,
-                Content = p.Content,
-                UserId = p.UserId,
-                Name = u.Name // Map the user's name here
-            }).ToList()
-        })
-        .ToListAsync();
+            var users = await _context.Users
+                .Include(u => u.Posts)
+                .Select(u => new UserDto
+                {
+                    Id = u.Id,
+                    Name = u.Name,
+                    Posts = u.Posts.Select(p => new PostDto
+                    {
+                        Id = p.Id,
+                        Title = p.Title,
+                        Content = p.Content,
+                        UserId = p.UserId,
+                        Name = u.Name // Map the user's name here
+                    }).ToList()
+                })
+                .ToListAsync();
 
-    return Ok(users);
-}
-
+            return Ok(users);
+        }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
@@ -68,29 +69,37 @@ public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
 
             return user;
         }
-        
-        //post user
-       [HttpPost]
-        public async Task<ActionResult<UserDto>> PostUser(UserDto userDto)
-        {
-            if (string.IsNullOrWhiteSpace(userDto.Name))
-                {
-            return BadRequest(new
-                {
-                    Title = "Validation Error",
-                    Errors = new { Name = "The Name field is required." }
-                });
-                 }
 
-             var user = new Models.User
-            {
-            Name = userDto.Name,
-            Posts = userDto.Posts?.Select(p => new Models.Post
-                {
-               Title = p.Title,
-                Content = p.Content
-                }).ToList() ?? new List<Models.Post>() // Handle null Posts
-                };
+[HttpPost]
+[Authorize]
+public async Task<ActionResult<UserDto>> PostUser(UserDto userDto)
+{
+    if (string.IsNullOrWhiteSpace(userDto.Name) || string.IsNullOrWhiteSpace(userDto.Email))
+    {
+        return BadRequest(new
+        {
+            Title = "Validation Error",
+            Errors = new { Message = "Name and Email are required." }
+        });
+    }
+
+    // Hash password if provided
+    string passwordHash = !string.IsNullOrEmpty(userDto.Password)
+        ? BCrypt.Net.BCrypt.HashPassword(userDto.Password)
+        : throw new ArgumentException("Password is required for user creation.");
+
+    var user = new Models.User
+    {
+        Name = userDto.Name,
+        Email = userDto.Email,
+        PasswordHash = passwordHash,
+        Role = userDto.Role ?? "User", // Default role to "User"
+        Posts = userDto.Posts?.Select(p => new Models.Post
+        {
+            Title = p.Title,
+            Content = p.Content
+        }).ToList() ?? new List<Models.Post>()
+    };
 
     _context.Users.Add(user);
     await _context.SaveChangesAsync();

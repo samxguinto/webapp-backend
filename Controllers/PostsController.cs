@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization; // Required for [Authorize]
 using WebApp.Data;
 using WebApp.DTOs;
 
@@ -7,6 +8,7 @@ namespace WebApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] // Apply authorization globally to the controller
     public class PostsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -16,62 +18,57 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-[HttpPost]
-public async Task<ActionResult<PostDto>> PostPost(PostDto postDto)
-{
-    var user = await _context.Users.FindAsync(postDto.UserId);
-    if (user == null)
-    {
-        return BadRequest("Invalid UserId. User does not exist.");
-    }
-
-    var post = new Models.Post
-    {
-        Title = postDto.Title,
-        Content = postDto.Content,
-        UserId = postDto.UserId // Correctly map UserId
-    };
-
-    try
-    {
-        _context.Posts.Add(post);
-        await _context.SaveChangesAsync();
-
-        postDto.Id = post.Id;
-        postDto.Name = user.Name; // Populate Name for the response
-        return CreatedAtAction(nameof(GetPost), new { id = post.Id }, postDto);
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, $"Internal server error: {ex.Message}");
-    }
-}
-
-
-        //get all
-[HttpGet]
-public async Task<ActionResult<IEnumerable<PostDto>>> GetPosts()
-{
-    var posts = await _context.Posts
-        .Include(p => p.User) // Ensure User is included for mapping
-        .Select(p => new PostDto
+        // POST: api/Posts
+        [HttpPost]
+        public async Task<ActionResult<PostDto>> PostPost(PostDto postDto)
         {
-            Id = p.Id,
-            Title = p.Title,
-            Content = p.Content,
-            UserId = p.UserId,
-            Name = p.User != null ? p.User.Name : "Unknown" // Safely map User.Name to PostDto.Name
-        })
-        .ToListAsync();
+            var user = await _context.Users.FindAsync(postDto.UserId);
+            if (user == null)
+            {
+                return BadRequest("Invalid UserId. User does not exist.");
+            }
 
-    return Ok(posts);
-}
+            var post = new Models.Post
+            {
+                Title = postDto.Title,
+                Content = postDto.Content,
+                UserId = postDto.UserId
+            };
 
+            try
+            {
+                _context.Posts.Add(post);
+                await _context.SaveChangesAsync();
 
+                postDto.Id = post.Id;
+                postDto.Name = user.Name; // Populate Name for the response
+                return CreatedAtAction(nameof(GetPost), new { id = post.Id }, postDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
+        // GET: api/Posts
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<PostDto>>> GetPosts()
+        {
+            var posts = await _context.Posts
+                .Include(p => p.User)
+                .Select(p => new PostDto
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Content = p.Content,
+                    UserId = p.UserId,
+                    Name = p.User != null ? p.User.Name : "Unknown"
+                })
+                .ToListAsync();
 
+            return Ok(posts);
+        }
 
-      
         // GET: api/Posts/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PostDto>> GetPost(int id)
@@ -93,7 +90,6 @@ public async Task<ActionResult<IEnumerable<PostDto>>> GetPosts()
 
             return post;
         }
-
 
         // PUT: api/Posts/5
         [HttpPut("{id}")]

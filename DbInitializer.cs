@@ -12,18 +12,25 @@ public static class DbInitializer
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
+        // Ensure database is created
+        context.Database.EnsureCreated();
+
+        // Seed only if no users exist
         if (!context.Users.Any())
         {
-            var user = new User
+            var adminUser = new User
             {
-                Name = "John Doe",
+                Name = "Admin",
+                Email = "admin@example.com", // Required Email
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"), // Secure password
+                Role = "Admin",
                 Posts = new List<Post>
                 {
-                    new Post { Title = "First Post", Content = "Hello, world!" }
+                    new Post { Title = "Welcome Post", Content = "This is the first post by Admin!" }
                 }
             };
 
-            context.Users.Add(user);
+            context.Users.Add(adminUser);
             context.SaveChanges();
         }
     }

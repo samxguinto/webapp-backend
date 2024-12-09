@@ -4,38 +4,38 @@
 
 namespace WebApp.Migrations
 {
-    public partial class UpdatePostsNonNullable : Migration
+    public partial class MakeEmailNullable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.UpdateData(
-                table: "Users",
-                keyColumn: "Name",
-                keyValue: null,
-                column: "Name",
-                value: "");
-
             migrationBuilder.AlterColumn<string>(
-                name: "Name",
+                name: "Email",
                 table: "Users",
                 type: "longtext",
-                nullable: false,
+                nullable: true,
                 oldClrType: typeof(string),
-                oldType: "longtext",
-                oldNullable: true)
+                oldType: "longtext")
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .OldAnnotation("MySql:CharSet", "utf8mb4");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.UpdateData(
+                table: "Users",
+                keyColumn: "Email",
+                keyValue: null,
+                column: "Email",
+                value: "");
+
             migrationBuilder.AlterColumn<string>(
-                name: "Name",
+                name: "Email",
                 table: "Users",
                 type: "longtext",
-                nullable: true,
+                nullable: false,
                 oldClrType: typeof(string),
-                oldType: "longtext")
+                oldType: "longtext",
+                oldNullable: true)
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .OldAnnotation("MySql:CharSet", "utf8mb4");
         }
