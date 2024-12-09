@@ -8,7 +8,6 @@ namespace WebApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Apply authorization globally to the controller
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -71,7 +70,6 @@ namespace WebApp.Controllers
         }
 
 [HttpPost]
-[Authorize]
 public async Task<ActionResult<UserDto>> PostUser(UserDto userDto)
 {
     if (string.IsNullOrWhiteSpace(userDto.Name) || string.IsNullOrWhiteSpace(userDto.Email))

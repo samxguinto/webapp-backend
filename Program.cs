@@ -62,11 +62,11 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 // Ensure authentication and authorization middleware are added
-app.UseAuthentication();
-app.UseAuthorization();
+//app.UseAuthentication();
+//app.UseAuthorization();
 
 app.MapControllers();
 
-DbInitializer.Seed(app.Services);
+//DbInitializer.Seed(app.Services);
 
 app.Run();

@@ -23,24 +23,26 @@ namespace WebApp.Controllers
             _config = config;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDto registerDto)
-        {
-            if (await _context.Users.AnyAsync(u => u.Email == registerDto.Email))
-                return BadRequest("Email is already registered.");
+[HttpPost("register")]
+public async Task<IActionResult> Register(RegisterDto registerDto)
+{
+    if (await _context.Users.AnyAsync(u => u.Email == registerDto.Email))
+        return BadRequest(new { message = "Email is already registered." });
 
-            var user = new User
-            {
-                Name = registerDto.Name,
-                Email = registerDto.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password)
-            };
+    var user = new User
+    {
+        Name = registerDto.Name,
+        Email = registerDto.Email,
+        PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
+        Role = "User" // Set a default role
+    };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+    _context.Users.Add(user);
+    await _context.SaveChangesAsync();
 
-            return Ok("Registration successful.");
-        }
+    return Ok(new { message = "Registration successful." });
+}
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)

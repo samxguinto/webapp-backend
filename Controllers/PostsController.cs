@@ -8,7 +8,6 @@ namespace WebApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Apply authorization globally to the controller
     public class PostsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
