@@ -61,12 +61,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
-// Ensure authentication and authorization middleware are added
-//app.UseAuthentication();
-//app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
 
-//DbInitializer.Seed(app.Services);
+DbInitializer.Seed(app.Services);
 
 app.Run();

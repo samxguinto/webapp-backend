@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using WebApp.Data;       // Namespace for ApplicationDbContext
-using WebApp.Models;     // Namespace for User and Post
+using WebApp.Data;       
+using WebApp.Models;     
 
 public static class DbInitializer
 {
@@ -18,19 +18,19 @@ public static class DbInitializer
         // Seed only if no users exist
         if (!context.Users.Any())
         {
-            var adminUser = new User
+            var User = new User
             {
-                Name = "Admin",
-                Email = "admin@example.com", // Required Email
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"), // Secure password
+                Name = "Sam",
+                Email = "sam@gmail.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
                 Role = "Admin",
                 Posts = new List<Post>
                 {
-                    new Post { Title = "Welcome Post", Content = "This is the first post by Admin!" }
+                    new Post { Title = "Hello Professor!", Content = "Have fun creating editing and deleting posts in the app. I recommend clicking the register button and registering with an email and password and then logging in. If you check the console you can see the JWT token displayed. Then feel free to create edit and delete users and posts. Remember posts must be tied to a valid user ID or they wont be created. Have fun! " }
                 }
             };
 
-            context.Users.Add(adminUser);
+            context.Users.Add(User);
             context.SaveChanges();
         }
     }

@@ -34,7 +34,7 @@ public async Task<IActionResult> Register(RegisterDto registerDto)
         Name = registerDto.Name,
         Email = registerDto.Email,
         PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-        Role = "User" // Set a default role
+        Role = "User" 
     };
 
     _context.Users.Add(user);

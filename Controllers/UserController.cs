@@ -107,47 +107,56 @@ public async Task<ActionResult<UserDto>> PostUser(UserDto userDto)
 }
 
 
-        // PUT: api/Users/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, UserDto userDto)
+[HttpPut("{id}")]
+public async Task<IActionResult> PutUser(int id, UserDto userDto)
+{
+    if (id != userDto.Id)
+    {
+        return BadRequest(new { message = "ID mismatch" });
+    }
+
+    var user = await _context.Users.Include(u => u.Posts).FirstOrDefaultAsync(u => u.Id == id);
+    if (user == null)
+    {
+        return NotFound(new { message = "User not found" });
+    }
+
+    // Only update fields that are not null
+    if (!string.IsNullOrWhiteSpace(userDto.Name))
+        user.Name = userDto.Name;
+
+    if (!string.IsNullOrWhiteSpace(userDto.Email))
+        user.Email = userDto.Email;
+
+    if (!string.IsNullOrWhiteSpace(userDto.Password))
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+
+    if (userDto.Posts != null)
+        user.Posts = userDto.Posts.Select(p => new Models.Post
         {
-            if (id != userDto.Id)
-            {
-                return BadRequest();
-            }
+            Title = p.Title,
+            Content = p.Content
+        }).ToList();
 
-            var user = await _context.Users.Include(u => u.Posts).FirstOrDefaultAsync(u => u.Id == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+    _context.Entry(user).State = EntityState.Modified;
 
-            user.Name = userDto.Name;
-
-            // Update Posts (simplified logic for demo purposes)
-            user.Posts = userDto.Posts.Select(p => new Models.Post
-            {
-                Title = p.Title,
-                Content = p.Content
-            }).ToList();
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Users.Any(e => e.Id == id))
-                {
-                    return NotFound();
-                }
-                throw;
-            }
-
-            return NoContent();
+    try
+    {
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+        if (!_context.Users.Any(e => e.Id == id))
+        {
+            return NotFound();
         }
+        throw;
+    }
+}
+
+
+
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
