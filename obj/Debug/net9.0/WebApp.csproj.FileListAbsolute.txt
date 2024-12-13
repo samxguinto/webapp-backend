@@ -48,3 +48,4 @@
 /Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.pdb
 /Users/sam/repos/WebApp/obj/Debug/net9.0/WebApp.genruntimeconfig.cache
 /Users/sam/repos/WebApp/obj/Debug/net9.0/ref/WebApp.dll
+/Users/sam/repos/WebApp/bin/Debug/net9.0/appsettings.Production.json
